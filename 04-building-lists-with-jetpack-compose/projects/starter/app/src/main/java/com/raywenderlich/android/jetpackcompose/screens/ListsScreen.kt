@@ -35,8 +35,22 @@
 package com.raywenderlich.android.jetpackcompose.screens
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.raywenderlich.android.jetpackcompose.R
 import com.raywenderlich.android.jetpackcompose.router.BackButtonHandler
 import com.raywenderlich.android.jetpackcompose.router.JetFundamentalsRouter
@@ -77,21 +91,50 @@ private val items = listOf(
 
 @Composable
 fun ListScreen() {
-  MyList()
+    MyList()
 
-  BackButtonHandler {
-    JetFundamentalsRouter.navigateTo(Screen.Navigation)
-  }
+    BackButtonHandler {
+        JetFundamentalsRouter.navigateTo(Screen.Navigation)
+    }
 }
 
+@Preview
 @Composable
 fun MyList() {
-  //TODO add your code here
+    LazyColumn {
+        items(items) { item ->
+            ListItem(item)
+        }
+    }
 }
 
 @Composable
 fun ListItem(bookCategory: BookCategory, modifier: Modifier = Modifier) {
-  //TODO add your code here
+    Column(modifier = modifier.padding(8.dp)) {
+        Text(
+            text = stringResource(id = bookCategory.categoryResourceId),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(id = R.color.colorPrimary)
+        )
+        Spacer(modifier = modifier.height(8.dp))
+
+        LazyRow {
+            items(bookCategory.bookImageResources) { item ->
+                BookImage(item)
+            }
+        }
+    }
+}
+
+@Composable
+private fun BookImage(imageResource: Int) {
+    Image(
+        modifier = Modifier.size(170.dp, 170.dp),
+        painter = painterResource(id = imageResource),
+        contentScale = ContentScale.Fit,
+        contentDescription = stringResource(id = R.string.book_image)
+    )
 }
 
 data class BookCategory(@StringRes val categoryResourceId: Int, val bookImageResources: List<Int>)
