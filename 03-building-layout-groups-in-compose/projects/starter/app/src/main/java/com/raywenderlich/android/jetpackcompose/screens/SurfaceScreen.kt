@@ -34,11 +34,19 @@
 
 package com.raywenderlich.android.jetpackcompose.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.raywenderlich.android.jetpackcompose.R
 import com.raywenderlich.android.jetpackcompose.router.BackButtonHandler
 import com.raywenderlich.android.jetpackcompose.router.JetFundamentalsRouter
 import com.raywenderlich.android.jetpackcompose.router.Screen
@@ -46,16 +54,24 @@ import com.raywenderlich.android.jetpackcompose.router.Screen
 @Composable
 fun SurfaceScreen(modifier: Modifier = Modifier) {
 
-  Box(modifier = modifier.fillMaxSize()) {
-    MySurface(modifier = modifier.align(Alignment.Center))
-  }
+    Box(modifier = modifier.fillMaxSize()) {
+        MySurface(modifier = modifier.align(Alignment.Center))
+    }
 
-  BackButtonHandler {
-    JetFundamentalsRouter.navigateTo(Screen.Navigation)
-  }
+    BackButtonHandler {
+        JetFundamentalsRouter.navigateTo(Screen.Navigation)
+    }
 }
 
+@Preview
 @Composable
-fun MySurface(modifier: Modifier) {
-  //TODO write your code here
+fun MySurface(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.size(100.dp),
+        color = Color.LightGray,
+        contentColor = colorResource(id = R.color.colorPrimary),
+        border = BorderStroke(1.dp, Color.Black)
+    ) {
+        MyColumn()
+    }
 }
