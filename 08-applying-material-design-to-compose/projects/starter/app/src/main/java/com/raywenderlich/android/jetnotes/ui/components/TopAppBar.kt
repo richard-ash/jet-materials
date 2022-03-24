@@ -59,9 +59,9 @@ import com.raywenderlich.android.jetnotes.theme.JetNotesTheme
 
 @Composable
 fun TopAppBar(
-  title: String,
-  icon: ImageVector,
-  onIconClick: () -> Unit,
+    title: String,
+    icon: ImageVector,
+    onIconClick: () -> Unit,
 ) {
   Row(
     modifier = Modifier
