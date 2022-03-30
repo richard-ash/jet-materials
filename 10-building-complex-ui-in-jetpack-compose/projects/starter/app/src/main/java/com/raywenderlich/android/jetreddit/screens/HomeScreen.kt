@@ -51,5 +51,16 @@ import com.raywenderlich.android.jetreddit.viewmodel.MainViewModel
 
 @Composable
 fun HomeScreen(viewModel: MainViewModel) {
-  //TODO add your code here
+    val posts: List<PostModel> by viewModel.allPosts.observeAsState(initial = listOf())
+    
+    LazyColumn(modifier = Modifier.background(color = MaterialTheme.colors.secondary)) {
+        items(posts) {
+            if (it.type == PostType.TEXT) {
+                TextPost(post = it)
+            } else {
+                ImagePost(post = it)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+        }
+    }
 }
