@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -56,47 +57,52 @@ import com.raywenderlich.android.jetreddit.screens.MyProfileScreen
 import com.raywenderlich.android.jetreddit.screens.SubredditsScreen
 import com.raywenderlich.android.jetreddit.theme.JetRedditTheme
 import com.raywenderlich.android.jetreddit.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun JetRedditApp(viewModel: MainViewModel) {
-  JetRedditTheme {
-    AppContent(viewModel)
-  }
+    JetRedditTheme {
+        AppContent(viewModel)
+    }
 }
 
 @Composable
 private fun AppContent(viewModel: MainViewModel) {
-  val scaffoldState: ScaffoldState = rememberScaffoldState()
-  Crossfade(current = JetRedditRouter.currentScreen) { screenState: MutableState<Screen> ->
+    val scaffoldState: ScaffoldState = rememberScaffoldState()
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    Crossfade(targetState = JetRedditRouter.currentScreen) { screenState: MutableState<Screen> ->
 
-    Scaffold(
-      topBar = getTopBar(screenState.value, scaffoldState),
-      drawerContent = {
-        AppDrawer(
-          closeDrawerAction = { scaffoldState.drawerState.close() }
+        Scaffold(
+            topBar = getTopBar(screenState.value, scaffoldState),
+            drawerContent = {
+                AppDrawer(
+                    closeDrawerAction = {
+                        coroutineScope.launch { scaffoldState.drawerState.close() }
+                    }
+                )
+            },
+            scaffoldState = scaffoldState,
+            bottomBar = {
+                BottomNavigationComponent(screenState = screenState)
+            },
+            content = {
+                MainScreenContainer(
+                    modifier = Modifier.padding(bottom = 56.dp),
+                    screenState = screenState,
+                    viewModel = viewModel
+                )
+            }
         )
-      },
-      scaffoldState = scaffoldState,
-      bottomBar = {
-        BottomNavigationComponent(screenState = screenState)
-      },
-      bodyContent = {
-        MainScreenContainer(
-          modifier = Modifier.padding(bottom = 56.dp),
-          screenState = screenState,
-          viewModel = viewModel
-        )
-      }
-    )
-  }
+    }
 }
 
 fun getTopBar(screenState: Screen, scaffoldState: ScaffoldState): @Composable (() -> Unit) {
-  if (screenState == Screen.MyProfile) {
-    return {}
-  } else {
-    return { TopAppBar(scaffoldState = scaffoldState) }
-  }
+    if (screenState == Screen.MyProfile) {
+        return {}
+    } else {
+        return { TopAppBar(scaffoldState = scaffoldState) }
+    }
 }
 
 /**
@@ -105,72 +111,79 @@ fun getTopBar(screenState: Screen, scaffoldState: ScaffoldState): @Composable ((
 @Composable
 fun TopAppBar(scaffoldState: ScaffoldState) {
 
-  val colors = MaterialTheme.colors
+    val colors = MaterialTheme.colors
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
-  TopAppBar(
-    title = {
-      Text(
-        text = stringResource(JetRedditRouter.currentScreen.value.titleResId),
-        color = colors.primaryVariant
-      )
-    },
-    backgroundColor = colors.surface,
-    navigationIcon = {
-      IconButton(onClick = {
-        scaffoldState.drawerState.open()
-      }) {
-        Icon(
-          Icons.Filled.AccountCircle,
-          tint = Color.LightGray
-        )
-      }
-    }
-  )
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(JetRedditRouter.currentScreen.value.titleResId),
+                color = colors.primaryVariant
+            )
+        },
+        backgroundColor = colors.surface,
+        navigationIcon = {
+            IconButton(onClick = {
+                coroutineScope.launch { scaffoldState.drawerState.open() }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = null,
+                    tint = Color.LightGray
+                )
+            }
+        }
+    )
 }
 
 @Composable
 private fun MainScreenContainer(
-  modifier: Modifier = Modifier,
-  screenState: MutableState<Screen>,
-  viewModel: MainViewModel
+    modifier: Modifier = Modifier,
+    screenState: MutableState<Screen>,
+    viewModel: MainViewModel
 ) {
-  Surface(
-    modifier = modifier,
-    color = MaterialTheme.colors.background
-  ) {
-    when (screenState.value) {
-      Screen.Home -> HomeScreen(viewModel)
-      Screen.Subscriptions -> SubredditsScreen()
-      Screen.NewPost -> AddScreen()
-      Screen.MyProfile -> MyProfileScreen(viewModel)
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colors.background
+    ) {
+        when (screenState.value) {
+            Screen.Home -> HomeScreen(viewModel)
+            Screen.Subscriptions -> SubredditsScreen()
+            Screen.NewPost -> AddScreen()
+            Screen.MyProfile -> MyProfileScreen(viewModel)
+        }
     }
-  }
 }
 
 @Composable
 private fun BottomNavigationComponent(
-  modifier: Modifier = Modifier,
-  screenState: MutableState<Screen>
+    modifier: Modifier = Modifier,
+    screenState: MutableState<Screen>
 ) {
-  var selectedItem by remember { mutableStateOf(0) }
+    var selectedItem by remember { mutableStateOf(0) }
 
-  val items = listOf(
-    NavigationItem(0, R.drawable.ic_baseline_home_24, Screen.Home),
-    NavigationItem(1, R.drawable.ic_baseline_format_list_bulleted_24, Screen.Subscriptions),
-    NavigationItem(2, R.drawable.ic_baseline_add_24, Screen.NewPost),
-  )
-  BottomNavigation(modifier = modifier) {
-    items.forEach {
-      BottomNavigationItem(
-        icon = { Icon(vectorResource(id = it.vectorResourceId)) },
-        selected = selectedItem == it.index,
-        onClick = {
-          selectedItem = it.index
-          screenState.value = it.screen
+    val items = listOf(
+        NavigationItem(0, R.drawable.ic_baseline_home_24, Screen.Home),
+        NavigationItem(1, R.drawable.ic_baseline_format_list_bulleted_24, Screen.Subscriptions),
+        NavigationItem(2, R.drawable.ic_baseline_add_24, Screen.NewPost),
+    )
+    BottomNavigation(modifier = modifier) {
+        items.forEach {
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = it.vectorResourceId),
+                        contentDescription = null
+                    )
+                },
+                selected = selectedItem == it.index,
+                onClick = {
+                    selectedItem = it.index
+                    screenState.value = it.screen
+                }
+            )
         }
-      )
     }
-  }
 }
 
 private data class NavigationItem(val index: Int, val vectorResourceId: Int, val screen: Screen)
