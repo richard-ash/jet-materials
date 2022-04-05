@@ -61,21 +61,25 @@ import com.raywenderlich.android.jetreddit.domain.model.PostModel
 import com.raywenderlich.android.jetreddit.domain.model.PostModel.Companion.DEFAULT_POST
 
 @Composable
-fun TextPost(post: PostModel) {
-    Post(post) {
+fun TextPost(post: PostModel, onJoinButtonClick: (Boolean) -> Unit) {
+    Post(post, onJoinButtonClick = onJoinButtonClick) {
         TextContent(post.text)
     }
 }
 
 @Composable
-fun ImagePost(post: PostModel) {
-    Post(post) {
+fun ImagePost(post: PostModel, onJoinButtonClick: (Boolean) -> Unit) {
+    Post(post, onJoinButtonClick = onJoinButtonClick) {
         ImageContent(post.image ?: R.drawable.compose_course)
     }
 }
 
 @Composable
-fun Post(post: PostModel, content: @Composable () -> Unit = {}) {
+fun Post(
+    post: PostModel,
+    onJoinButtonClick: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit = {}
+) {
     Card(shape = MaterialTheme.shapes.large) {
         Column(
             modifier = Modifier.padding(
@@ -83,7 +87,7 @@ fun Post(post: PostModel, content: @Composable () -> Unit = {}) {
                 bottom = 8.dp
             )
         ) {
-            Header(post)
+            Header(post, onJoinButtonClick)
             Spacer(modifier = Modifier.height(4.dp))
             content.invoke()
             Spacer(modifier = Modifier.height(8.dp))
@@ -93,11 +97,11 @@ fun Post(post: PostModel, content: @Composable () -> Unit = {}) {
 }
 
 @Composable
-fun Header(post: PostModel) {
+fun Header(post: PostModel, onJoinButtonClick: (Boolean) -> Unit = {}) {
     Row(modifier = Modifier.padding(start = 16.dp)) {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.subreddit_placeholder),
-            contentDescription = null,
+            contentDescription = stringResource(id = R.string.subreddits),
             Modifier
                 .size(40.dp)
                 .clip(CircleShape)
@@ -114,6 +118,8 @@ fun Header(post: PostModel) {
                 color = Color.Gray
             )
         }
+        Spacer(modifier = Modifier.width(4.dp))
+        JoinButton(onClick = onJoinButtonClick)
         MoreActionsMenu()
     }
 
