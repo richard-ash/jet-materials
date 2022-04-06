@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     )
   })
 
-  @ExperimentalAnimationApi
+  @OptIn(ExperimentalAnimationApi::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
